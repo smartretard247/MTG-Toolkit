@@ -12,6 +12,7 @@ import GameplayKit
 
 class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelegate {
     @IBOutlet var carousel: iCarousel!
+    public static var screenScale: CGFloat = 1.0
     
     var firstTap = true
     var card = UIImageView()
@@ -87,25 +88,31 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if(UIDevice.current.model == "iPhone") {
+            GameViewController.screenScale = 0.35
+        }
+        
         for i in 1...GameScene.numCardFronts {
-            cardFronts.append(UIImage(named: "images/cardFront\(i).png")!)
+            let tempImage = UIImage(named: "images/cardFront\(i).png")
+            cardFronts.append(tempImage!.scaleImage(toSize: CGSize(width: tempImage!.size.width*GameViewController.screenScale, height: tempImage!.size.height*GameViewController.screenScale))!)
         }
         
         let image = UIImage(named: "images/cardBack.png")
-        card = UIImageView(image: image!)
+        let resizedImage = image?.scaleImage(toSize: CGSize(width: image!.size.width*GameViewController.screenScale, height: image!.size.height*GameViewController.screenScale))
+        card = UIImageView(image: resizedImage!)
         card.isUserInteractionEnabled = true
         card.contentMode = .center
         card.center = self.view.center
         self.view.addSubview(card)
-        GameViewController.cardFrameHeight = card.frame.size.height
-        GameViewController.cardFrameWidth = card.frame.size.width
+        GameViewController.cardFrameHeight = card.image!.size.height
+        GameViewController.cardFrameWidth = card.image!.size.width
         GameViewController.cardFrameX = card.frame.origin.x
         GameViewController.cardFrameY = card.frame.origin.y
         
         let imageF = UIImage(named: "images/cardFront1.png")
         //let imageScaled = imageF!.scaleImage(toSize:
-        //    CGSize(width: imageF!.size.width * 1.2,
-        //           height: imageF!.size.height * 1.2))
+        //    CGSize(width: imageF!.size.width * GameViewController.screenScale,
+        //           height: imageF!.size.height * GameViewController.screenScale))
         let tempCardF = UIImageView(image: imageF!)
         tempCardF.contentMode = .center
         tempCardF.center = self.view.center

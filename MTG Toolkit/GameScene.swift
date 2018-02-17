@@ -59,8 +59,16 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         // Create shape node to use during mouse interaction
+        var backgroundScaleOffset: CGFloat = 0.0
+        if(UIDevice.current.model == "iPhone") {
+            backgroundScaleOffset = 0.1
+        }
+        
         let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
+        self.spinnyNode = SKShapeNode.init(
+            rectOf: CGSize.init(width: w*GameViewController.screenScale,
+                                height: w*GameViewController.screenScale),
+                                cornerRadius: w * 0.3 * GameViewController.screenScale)
         
         if let spinnyNode = self.spinnyNode {
             spinnyNode.lineWidth = 2.5
@@ -75,7 +83,10 @@ class GameScene: SKScene {
         //background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
         //background.zRotation = CGFloat(-Double.pi/2)
         background.zPosition = -1
-        background.xScale = frame.width/background.frame.width
+        background.xScale = frame.width/background.frame.width + backgroundScaleOffset
+        if(UIDevice.current.model == "iPhone") {
+            background.yScale = background.frame.height/frame.height + backgroundScaleOffset
+        }
         addChild(background)
         
         //player one health
@@ -325,12 +336,6 @@ class GameScene: SKScene {
         }
         
         if(!GameScene.cardIsHidden &&
-            pos.x > (GameViewController.cardFrameX - GameViewController.cardFrameWidth/2) &&
-            pos.x <= (GameViewController.cardFrameX + GameViewController.cardFrameWidth/2) &&
-            pos.y > (GameViewController.cardFrameY - GameViewController.cardFrameHeight/2) &&
-            pos.y <= (GameViewController.cardFrameY + GameViewController.cardFrameHeight/2)) {
-            GameScene.cardIsHidden = true
-        } else if(!GameScene.cardIsHidden &&
             pos.x > (rollButton.position.x - rollButton.frame.width/2) &&
             pos.x <= (rollButton.position.x + rollButton.frame.width/2) &&
             pos.y > (rollButton.position.y - rollButton.frame.height/2) &&
@@ -443,7 +448,7 @@ class GameScene: SKScene {
             pTwoHealth += 1
             if(pTwoHealth < 21) {
                 pTwo.isHidden = false
-                pTwo.texture = SKTexture(imageNamed: "images/pone\(pTwoHealth).png")
+                pTwo.texture = SKTexture(imageNamed: "images/ptwo\(pTwoHealth).png")
                 rollAnimation(pTwo)
             } else {
                 pTwoHiddenLabel.text = "\(pTwoHealth)"
@@ -458,7 +463,7 @@ class GameScene: SKScene {
             pTwoHealth -= 1
             if(pTwoHealth < 21 && pTwoHealth > 0) {
                 pTwo.isHidden = false
-                pTwo.texture = SKTexture(imageNamed: "images/pone\(pTwoHealth).png")
+                pTwo.texture = SKTexture(imageNamed: "images/ptwo\(pTwoHealth).png")
                 rollAnimation(pTwo)
             } else if(pTwoHealth > 20) {
                 pTwoHiddenLabel.text = "\(pTwoHealth)"
@@ -476,7 +481,7 @@ class GameScene: SKScene {
             pTwoHealth += 3
             if(pTwoHealth < 21) {
                 pTwo.isHidden = false
-                pTwo.texture = SKTexture(imageNamed: "images/pone\(pTwoHealth).png")
+                pTwo.texture = SKTexture(imageNamed: "images/ptwo\(pTwoHealth).png")
                 rollAnimation(pTwo)
             } else {
                 pTwoHiddenLabel.text = "\(pTwoHealth)"
@@ -491,7 +496,7 @@ class GameScene: SKScene {
             pTwoHealth -= 3
             if(pTwoHealth < 21 && pTwoHealth > 0) {
                 pTwo.isHidden = false
-                pTwo.texture = SKTexture(imageNamed: "images/pone\(pTwoHealth).png")
+                pTwo.texture = SKTexture(imageNamed: "images/ptwo\(pTwoHealth).png")
                 rollAnimation(pTwo)
             } else if(pTwoHealth > 20) {
                 pTwoHiddenLabel.text = "\(pTwoHealth)"
@@ -536,6 +541,12 @@ class GameScene: SKScene {
             pTwoPlainswalkerHealth -= 1
             pTwoLoyaltyLabel.text = "\(pTwoPlainswalkerHealth)"
             pumpAnimation(pTwoLoyaltyLabel)
+        } else if(!GameScene.cardIsHidden &&
+            pos.x > (GameViewController.cardFrameX) &&
+            pos.x <= (GameViewController.cardFrameX + GameViewController.cardFrameWidth) &&
+            pos.y > (GameViewController.cardFrameY) &&
+            pos.y <= (GameViewController.cardFrameY + GameViewController.cardFrameHeight)) {
+            GameScene.cardIsHidden = true
         } else {
             //do nothing while carousel is displayed
         }
