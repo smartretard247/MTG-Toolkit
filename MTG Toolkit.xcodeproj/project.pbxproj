@@ -7,8 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		941866BC2039A8A00033C1CB /* MAGIC.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 941866BA2039A8A00033C1CB /* MAGIC.TTF */; };
+		941866BD2039A8A00033C1CB /* DeckModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941866BB2039A8A00033C1CB /* DeckModel.swift */; };
+		941866BF203A5C210033C1CB /* CardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941866BE203A5C210033C1CB /* CardModel.swift */; };
+		941866C1203A907F0033C1CB /* DeckCollectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941866C0203A907F0033C1CB /* DeckCollectionModel.swift */; };
+		941866C3203A9F610033C1CB /* HomeCardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941866C2203A9F610033C1CB /* HomeCardModel.swift */; };
+		941866C5203AA1520033C1CB /* CardCollectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941866C4203AA1520033C1CB /* CardCollectionModel.swift */; };
+		941866C7203AA49A0033C1CB /* HomeDeckModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941866C6203AA49A0033C1CB /* HomeDeckModel.swift */; };
 		945614FA202FE73C004DC60C /* images in Resources */ = {isa = PBXBuildFile; fileRef = 945614F9202FE73C004DC60C /* images */; };
-		945614FC20302D40004DC60C /* MAGIC.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 945614FB20302D40004DC60C /* MAGIC.TTF */; };
 		9456150220318F8E004DC60C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9456150120318F8E004DC60C /* QuartzCore.framework */; };
 		9456150E203198FD004DC60C /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9456150D203198FC004DC60C /* iCarousel.m */; };
 		945615112032B3A6004DC60C /* UIImageExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945615102032B3A6004DC60C /* UIImageExtention.swift */; };
@@ -42,8 +48,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		941866BA2039A8A00033C1CB /* MAGIC.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = MAGIC.TTF; sourceTree = "<group>"; };
+		941866BB2039A8A00033C1CB /* DeckModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeckModel.swift; sourceTree = "<group>"; };
+		941866BE203A5C210033C1CB /* CardModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardModel.swift; sourceTree = "<group>"; };
+		941866C0203A907F0033C1CB /* DeckCollectionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeckCollectionModel.swift; sourceTree = "<group>"; };
+		941866C2203A9F610033C1CB /* HomeCardModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCardModel.swift; sourceTree = "<group>"; };
+		941866C4203AA1520033C1CB /* CardCollectionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardCollectionModel.swift; sourceTree = "<group>"; };
+		941866C6203AA49A0033C1CB /* HomeDeckModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeDeckModel.swift; sourceTree = "<group>"; };
 		945614F9202FE73C004DC60C /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
-		945614FB20302D40004DC60C /* MAGIC.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = MAGIC.TTF; sourceTree = "<group>"; };
 		9456150120318F8E004DC60C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9456150B203198FC004DC60C /* MTG Toolkit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MTG Toolkit-Bridging-Header.h"; sourceTree = "<group>"; };
 		9456150C203198FC004DC60C /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
@@ -113,7 +125,6 @@
 		94F48A4E202FE24F00F2D4D9 = {
 			isa = PBXGroup;
 			children = (
-				945614FB20302D40004DC60C /* MAGIC.TTF */,
 				945614F9202FE73C004DC60C /* images */,
 				94F48A59202FE24F00F2D4D9 /* MTG Toolkit */,
 				94F48A74202FE24F00F2D4D9 /* MTG ToolkitTests */,
@@ -136,6 +147,13 @@
 		94F48A59202FE24F00F2D4D9 /* MTG Toolkit */ = {
 			isa = PBXGroup;
 			children = (
+				941866C4203AA1520033C1CB /* CardCollectionModel.swift */,
+				941866C0203A907F0033C1CB /* DeckCollectionModel.swift */,
+				941866C2203A9F610033C1CB /* HomeCardModel.swift */,
+				941866C6203AA49A0033C1CB /* HomeDeckModel.swift */,
+				941866BE203A5C210033C1CB /* CardModel.swift */,
+				941866BB2039A8A00033C1CB /* DeckModel.swift */,
+				941866BA2039A8A00033C1CB /* MAGIC.TTF */,
 				9456150F20319954004DC60C /* iCarousel */,
 				94F48A5A202FE24F00F2D4D9 /* AppDelegate.swift */,
 				94F48A5C202FE24F00F2D4D9 /* GameScene.sks */,
@@ -282,7 +300,7 @@
 				94F48A66202FE24F00F2D4D9 /* Main.storyboard in Resources */,
 				94F48A5D202FE24F00F2D4D9 /* GameScene.sks in Resources */,
 				94F48A68202FE24F00F2D4D9 /* Assets.xcassets in Resources */,
-				945614FC20302D40004DC60C /* MAGIC.TTF in Resources */,
+				941866BC2039A8A00033C1CB /* MAGIC.TTF in Resources */,
 				94F48A6B202FE24F00F2D4D9 /* LaunchScreen.storyboard in Resources */,
 				94F48A5F202FE24F00F2D4D9 /* Actions.sks in Resources */,
 			);
@@ -309,9 +327,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				941866C1203A907F0033C1CB /* DeckCollectionModel.swift in Sources */,
 				94F48A61202FE24F00F2D4D9 /* GameScene.swift in Sources */,
+				941866C3203A9F610033C1CB /* HomeCardModel.swift in Sources */,
+				941866C7203AA49A0033C1CB /* HomeDeckModel.swift in Sources */,
+				941866BD2039A8A00033C1CB /* DeckModel.swift in Sources */,
 				9456150E203198FD004DC60C /* iCarousel.m in Sources */,
 				94F48A63202FE24F00F2D4D9 /* GameViewController.swift in Sources */,
+				941866C5203AA1520033C1CB /* CardCollectionModel.swift in Sources */,
+				941866BF203A5C210033C1CB /* CardModel.swift in Sources */,
 				945615112032B3A6004DC60C /* UIImageExtention.swift in Sources */,
 				94F48A5B202FE24F00F2D4D9 /* AppDelegate.swift in Sources */,
 			);

@@ -14,6 +14,7 @@ class GameScene: SKScene {
     private var spinnyNode : SKShapeNode?
     
     public static var cardIsHidden = false
+    public static var viewingDecks = false
     
     //var cardFront = [SKSpriteNode]()
     var background = SKSpriteNode(imageNamed: "images/background.jpg")
@@ -80,8 +81,6 @@ class GameScene: SKScene {
         }
         
         //background image
-        //background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-        //background.zRotation = CGFloat(-Double.pi/2)
         background.zPosition = -1
         background.xScale = frame.width/background.frame.width + backgroundScaleOffset
         if(UIDevice.current.model == "iPhone") {
@@ -100,35 +99,55 @@ class GameScene: SKScene {
         addChild(pTwo)
         
         //loyalty health
+        let loyaltyOffset = CGFloat(70)
+        
         pOneLoyalty.zPosition = 0.05
         pOneLoyalty.position.x -= GameViewController.cardFrontWidth
         pOneLoyalty.position.y -= GameViewController.cardFrontHeight/2.1
+        if(UIDevice.current.model == "iPhone") {
+            pOneLoyalty.position.y += loyaltyOffset
+        }
         addChild(pOneLoyalty)
         
         pTwoLoyalty.zPosition = 0.05
         pTwoLoyalty.position.x += GameViewController.cardFrontWidth
         pTwoLoyalty.position.y -= GameViewController.cardFrontHeight/2.1
+        if(UIDevice.current.model == "iPhone") {
+            pTwoLoyalty.position.y += loyaltyOffset
+        }
         addChild(pTwoLoyalty)
         
         // loyalty health buttons
         pOneLoyaltyUp.zPosition = 0.05
         pOneLoyaltyUp.position.x -= GameViewController.cardFrontWidth
         pOneLoyaltyUp.position.y += -GameViewController.cardFrontHeight/2.2 + pOneLoyalty.frame.height/1.4
+        if(UIDevice.current.model == "iPhone") {
+            pOneLoyaltyUp.position.y += loyaltyOffset
+        }
         addChild(pOneLoyaltyUp)
         
         pTwoLoyaltyUp.zPosition = 0.05
         pTwoLoyaltyUp.position.x += GameViewController.cardFrontWidth
         pTwoLoyaltyUp.position.y += -GameViewController.cardFrontHeight/2.2 + pTwoLoyalty.frame.height/1.4
+        if(UIDevice.current.model == "iPhone") {
+            pTwoLoyaltyUp.position.y += loyaltyOffset
+        }
         addChild(pTwoLoyaltyUp)
         
         pOneLoyaltyDown.zPosition = 0.05
         pOneLoyaltyDown.position.x -= GameViewController.cardFrontWidth
         pOneLoyaltyDown.position.y += -GameViewController.cardFrontHeight/2 - pOneLoyalty.frame.height/1.4
+        if(UIDevice.current.model == "iPhone") {
+            pOneLoyaltyDown.position.y += loyaltyOffset
+        }
         addChild(pOneLoyaltyDown)
         
         pTwoLoyaltyDown.zPosition = 0.05
         pTwoLoyaltyDown.position.x += GameViewController.cardFrontWidth
         pTwoLoyaltyDown.position.y += -GameViewController.cardFrontHeight/2 - pTwoLoyalty.frame.height/1.4
+        if(UIDevice.current.model == "iPhone") {
+            pTwoLoyaltyDown.position.y += loyaltyOffset
+        }
         addChild(pTwoLoyaltyDown)
         
         // text on loyalty health
@@ -140,6 +159,9 @@ class GameScene: SKScene {
         pOneLoyaltyLabel.text = "\(pOnePlainswalkerHealth)"
         pOneLoyaltyLabel.position.x -= GameViewController.cardFrontWidth
         pOneLoyaltyLabel.position.y -= GameViewController.cardFrontHeight/2.1 + pOneLoyaltyLabel.frame.height/2
+        if(UIDevice.current.model == "iPhone") {
+            pOneLoyaltyLabel.position.y += loyaltyOffset
+        }
         addChild(pOneLoyaltyLabel)
         
         pTwoLoyaltyLabel = SKLabelNode(fontNamed: "Magic:the Gathering")
@@ -150,6 +172,9 @@ class GameScene: SKScene {
         pTwoLoyaltyLabel.text = "\(pOnePlainswalkerHealth)"
         pTwoLoyaltyLabel.position.x += GameViewController.cardFrontWidth
         pTwoLoyaltyLabel.position.y -= GameViewController.cardFrontHeight/2.1 + pTwoLoyaltyLabel.frame.height/2
+        if(UIDevice.current.model == "iPhone") {
+            pTwoLoyaltyLabel.position.y += loyaltyOffset
+        }
         addChild(pTwoLoyaltyLabel)
         
         // text on health buttons
@@ -268,28 +293,58 @@ class GameScene: SKScene {
         labelReset = SKLabelNode(fontNamed: "Magic:the Gathering")
         labelReset.zPosition = 0.06
         labelReset.text = "Reset"
-        labelReset.position.x -= GameViewController.cardFrameWidth/2
-        labelReset.position.y -= GameViewController.cardFrameHeight/2 + resetButton.frame.height/2 + 16
+        if(UIDevice.current.model == "iPhone") {
+            labelReset.xScale = GameViewController.screenScale
+            labelReset.yScale = GameViewController.screenScale
+            labelReset.position.x -= GameViewController.cardFrameWidth/2
+            labelReset.position.y -= (GameViewController.cardFrameHeight + resetButton.frame.height)
+                * (GameViewController.screenScale + 0.23) - resetButton.frame.height/4 - 1
+        } else {
+            labelReset.position.x -= GameViewController.cardFrameWidth/2
+            labelReset.position.y -= GameViewController.cardFrameHeight/2 + resetButton.frame.height/2 + 16
+        }
         addChild(labelReset)
         
         // reset buttons
         resetButton.zPosition = 0.05
-        resetButton.position.x -= GameViewController.cardFrameWidth/2
-        resetButton.position.y -= GameViewController.cardFrameHeight/2 + resetButton.frame.height/2 + 4
+        if(UIDevice.current.model == "iPhone") {
+            resetButton.xScale = GameViewController.screenScale
+            resetButton.yScale = GameViewController.screenScale
+            resetButton.position.x -= GameViewController.cardFrameWidth/2
+            resetButton.position.y -= (GameViewController.cardFrameHeight + resetButton.frame.height)
+                * (GameViewController.screenScale + 0.23)
+        } else {
+            resetButton.position.x -= GameViewController.cardFrameWidth/2
+            resetButton.position.y -= GameViewController.cardFrameHeight/2 + resetButton.frame.height/2 + 4
+        }
         addChild(resetButton)
         
         // text on roll buttons
         labelRoll = SKLabelNode(fontNamed: "Magic:the Gathering")
         labelRoll.zPosition = 0.06
         labelRoll.text = "Roll"
-        labelRoll.position.x += GameViewController.cardFrameWidth/2
-        labelRoll.position.y -= GameViewController.cardFrameHeight/2 + resetButton.frame.height/2 + 16
+        if(UIDevice.current.model == "iPhone") {
+            labelRoll.xScale = GameViewController.screenScale
+            labelRoll.yScale = GameViewController.screenScale
+            labelRoll.position.x = -labelReset.position.x
+            labelRoll.position.y = labelReset.position.y
+        } else {
+            labelRoll.position.x = -labelReset.position.x
+            labelRoll.position.y = labelReset.position.y
+        }
         addChild(labelRoll)
         
         // roll buttons
         rollButton.zPosition = 0.05
-        rollButton.position.x += GameViewController.cardFrameWidth/2
-        rollButton.position.y -= GameViewController.cardFrameHeight/2 + resetButton.frame.height/2 + 4
+        if(UIDevice.current.model == "iPhone") {
+            rollButton.xScale = GameViewController.screenScale
+            rollButton.yScale = GameViewController.screenScale
+            rollButton.position.x = -resetButton.position.x
+            rollButton.position.y = resetButton.position.y
+        } else {
+            rollButton.position.x = -resetButton.position.x
+            rollButton.position.y = resetButton.position.y
+        }
         addChild(rollButton)
         
         // hidden behind player health
@@ -322,6 +377,13 @@ class GameScene: SKScene {
         ]))
     }
     
+    func pressAnimation(_ node: SKNode) {
+        node.run(.sequence([
+            .scale(to: 1.1, duration: 0.1),
+            .scale(to: 1, duration: 0.1),
+            ]))
+    }
+    
     func flipAnimation(_ node: SKNode) {
         node.run(.sequence([
             .rotate(byAngle: .pi * 2, duration: 0.2)
@@ -340,6 +402,7 @@ class GameScene: SKScene {
             pos.x <= (rollButton.position.x + rollButton.frame.width/2) &&
             pos.y > (rollButton.position.y - rollButton.frame.height/2) &&
             pos.y <= (rollButton.position.y + rollButton.frame.height/2)) {
+            pressAnimation(rollButton)
             pOneHealth = Int(arc4random_uniform(20)) + 1
             pTwoHealth = Int(arc4random_uniform(20)) + 1
             print("Roll button clicked: P1 rolled a \(pOneHealth), P2 rolled a \(pTwoHealth)")
@@ -356,6 +419,7 @@ class GameScene: SKScene {
             pos.x <= (resetButton.position.x + resetButton.frame.width/2) &&
             pos.y > (resetButton.position.y - resetButton.frame.height/2) &&
             pos.y <= (resetButton.position.y + resetButton.frame.height/2)) {
+            pressAnimation(resetButton)
             print("Reset button clicked.")
             pOneHiddenLabel.text = ""
             pTwoHiddenLabel.text = ""
@@ -378,6 +442,7 @@ class GameScene: SKScene {
             pos.x <= (pOneUpOne.position.x + pOneUpOne.frame.width/2) &&
             pos.y > (pOneUpOne.position.y - pOneUpOne.frame.height/2) &&
             pos.y <= (pOneUpOne.position.y + pOneUpOne.frame.height/2)) {
+            pressAnimation(pOneUpOne)
             print("P1 increased by 1 health.")
             pOneHealth += 1
             if(pOneHealth < 21) {
@@ -393,6 +458,7 @@ class GameScene: SKScene {
             pos.x <= (pOneDownOne.position.x + pOneDownOne.frame.width/2) &&
             pos.y > (pOneDownOne.position.y - pOneDownOne.frame.height/2) &&
             pos.y <= (pOneDownOne.position.y + pOneDownOne.frame.height/2)) {
+            pressAnimation(pOneDownOne)
             print("P1 decreased by 1 health.")
             pOneHealth -= 1
             if(pOneHealth < 21 && pOneHealth > 0) {
@@ -411,6 +477,7 @@ class GameScene: SKScene {
             pos.x <= (pOneUpThree.position.x + pOneUpThree.frame.width/2) &&
             pos.y > (pOneUpThree.position.y - pOneUpThree.frame.height/2) &&
             pos.y <= (pOneUpThree.position.y + pOneUpThree.frame.height/2)) {
+            pressAnimation(pOneUpThree)
             print("P1 increased by 3 health.")
             pOneHealth += 3
             if(pOneHealth < 21) {
@@ -426,6 +493,7 @@ class GameScene: SKScene {
             pos.x <= (pOneDownThree.position.x + pOneDownThree.frame.width/2) &&
             pos.y > (pOneDownThree.position.y - pOneDownThree.frame.height/2) &&
             pos.y <= (pOneDownThree.position.y + pOneDownThree.frame.height/2)) {
+            pressAnimation(pOneDownThree)
             print("P1 decreased by 3 health.")
             pOneHealth -= 3
             if(pOneHealth < 21 && pOneHealth > 0) {
@@ -444,6 +512,7 @@ class GameScene: SKScene {
             pos.x <= (pTwoUpOne.position.x + pTwoUpOne.frame.width/2) &&
             pos.y > (pTwoUpOne.position.y - pTwoUpOne.frame.height/2) &&
             pos.y <= (pTwoUpOne.position.y + pTwoUpOne.frame.height/2)) {
+            pressAnimation(pTwoUpOne)
             print("P2 increased by 1 health.")
             pTwoHealth += 1
             if(pTwoHealth < 21) {
@@ -459,6 +528,7 @@ class GameScene: SKScene {
             pos.x <= (pTwoDownOne.position.x + pTwoDownOne.frame.width/2) &&
             pos.y > (pTwoDownOne.position.y - pTwoDownOne.frame.height/2) &&
             pos.y <= (pTwoDownOne.position.y + pTwoDownOne.frame.height/2)) {
+            pressAnimation(pTwoDownOne)
             print("P2 decreased by 1 health.")
             pTwoHealth -= 1
             if(pTwoHealth < 21 && pTwoHealth > 0) {
@@ -477,6 +547,7 @@ class GameScene: SKScene {
             pos.x <= (pTwoUpThree.position.x + pTwoUpThree.frame.width/2) &&
             pos.y > (pTwoUpThree.position.y - pTwoUpThree.frame.height/2) &&
             pos.y <= (pTwoUpThree.position.y + pTwoUpThree.frame.height/2)) {
+            pressAnimation(pTwoUpThree)
             print("P2 increased by 3 health.")
             pTwoHealth += 3
             if(pTwoHealth < 21) {
@@ -492,6 +563,7 @@ class GameScene: SKScene {
             pos.x <= (pTwoDownThree.position.x + pTwoDownThree.frame.width/2) &&
             pos.y > (pTwoDownThree.position.y - pTwoDownThree.frame.height/2) &&
             pos.y <= (pTwoDownThree.position.y + pTwoDownThree.frame.height/2)) {
+            pressAnimation(pTwoDownThree)
             print("P2 decreased by 3 health.")
             pTwoHealth -= 3
             if(pTwoHealth < 21 && pTwoHealth > 0) {
@@ -510,6 +582,7 @@ class GameScene: SKScene {
             pos.x <= (pOneLoyaltyUp.position.x + pOneLoyaltyUp.frame.width/2) &&
             pos.y > (pOneLoyaltyUp.position.y - pOneLoyaltyUp.frame.height/2) &&
             pos.y <= (pOneLoyaltyUp.position.y + pOneLoyaltyUp.frame.height/2)) {
+            pressAnimation(pOneLoyaltyUp)
             print("P1 plainswalker gained health.")
             pOnePlainswalkerHealth += 1
             pOneLoyaltyLabel.text = "\(pOnePlainswalkerHealth)"
@@ -519,6 +592,7 @@ class GameScene: SKScene {
             pos.x <= (pOneLoyaltyDown.position.x + pOneLoyaltyDown.frame.width/2) &&
             pos.y > (pOneLoyaltyDown.position.y - pOneLoyaltyDown.frame.height/2) &&
             pos.y <= (pOneLoyaltyDown.position.y + pOneLoyaltyDown.frame.height/2)) {
+            pressAnimation(pOneLoyaltyDown)
             print("P1 plainswalker lost health.")
             pOnePlainswalkerHealth -= 1
             pOneLoyaltyLabel.text = "\(pOnePlainswalkerHealth)"
@@ -528,6 +602,7 @@ class GameScene: SKScene {
             pos.x <= (pTwoLoyaltyUp.position.x + pTwoLoyaltyUp.frame.width/2) &&
             pos.y > (pTwoLoyaltyUp.position.y - pTwoLoyaltyUp.frame.height/2) &&
             pos.y <= (pTwoLoyaltyUp.position.y + pTwoLoyaltyUp.frame.height/2)) {
+            pressAnimation(pTwoLoyaltyUp)
             print("P2 plainswalker gained health.")
             pTwoPlainswalkerHealth += 1
             pTwoLoyaltyLabel.text = "\(pTwoPlainswalkerHealth)"
@@ -537,6 +612,7 @@ class GameScene: SKScene {
             pos.x <= (pTwoLoyaltyDown.position.x + pTwoLoyaltyDown.frame.width/2) &&
             pos.y > (pTwoLoyaltyDown.position.y - pTwoLoyaltyDown.frame.height/2) &&
             pos.y <= (pTwoLoyaltyDown.position.y + pTwoLoyaltyDown.frame.height/2)) {
+            pressAnimation(pTwoLoyaltyDown)
             print("P2 plainswalker lost health.")
             pTwoPlainswalkerHealth -= 1
             pTwoLoyaltyLabel.text = "\(pTwoPlainswalkerHealth)"

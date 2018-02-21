@@ -11,12 +11,23 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelegate {
+    static let ip : String = "180.131.244.199"
+    //static let ip : String = "192.168.1.100"
+    static let baseUrl: String = "http://\(GameViewController.ip)/magic/"
+    static let imageUrl: String = "http://\(GameViewController.ip)/magic/images/decks/"
+    
     @IBOutlet var carousel: iCarousel!
     public static var screenScale: CGFloat = 1.0
     
+    static var cc = CardCollectionModel()
+    static var dc = DeckCollectionModel()
+    static var loaded = false
+    
     var firstTap = true
     var card = UIImageView()
+    var viewDeckButton = UIImageView()
     var cardFronts = [UIImage]()
+    var deckFronts = [UIImage]()
     static var cardFrontWidth: CGFloat = 0
     static var cardFrontHeight: CGFloat = 0
     static var cardFrontX: CGFloat = 0
@@ -75,26 +86,143 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
         "+1/+1": "A bonus applied to a creature giving +1 to its power and +1 to its toughness. The numbers can be any value, including negative numbers."
     ]
     
-    @objc func toggleCarousel(_ sender: UITapGestureRecognizer) {
-        GameScene.cardIsHidden = !GameScene.cardIsHidden
-        carousel.isHidden = !carousel.isHidden
-        card.isHidden = !card.isHidden
+    @objc func turnOffCarousel(_ sender: UITapGestureRecognizer) {
+        GameScene.viewingDecks = false
+        GameScene.cardIsHidden = false
+        carousel.isHidden = true
+        card.isHidden = false
+    }
+    
+    func pumpDeckButton() {
+        self.viewDeckButton.startAnimating()
+    }
+    
+    @objc func toggleDeckCarousel(_ sender: UITapGestureRecognizer) {
+        pumpDeckButton()
         
+        if(CardCollectionModel.loaded && DeckCollectionModel.loaded && !GameViewController.loaded) {
+            self.loadCardImages()
+        }
+        
+        if(GameViewController.loaded) {
+            GameScene.viewingDecks = !GameScene.viewingDecks
+            carousel.reloadData()
+            if(!GameScene.viewingDecks) {
+                print("Exited deck viewing mode.")
+                GameScene.cardIsHidden = false
+                carousel.isHidden = true
+                card.isHidden = false
+            } else {
+                print("Now viewing decks.")
+                GameScene.cardIsHidden = true
+                carousel.isHidden = false
+                card.isHidden = true
+                
+                if(!carousel.isHidden) {
+                    carousel.scrollToItem(at: 0, animated: true)
+                }
+                
+                for c in GameViewController.cc.cards {
+                    print("Key => \(c.key), Value: ", terminator:"")
+                    print(c.value.cardName!)
+                }
+            }
+        } else {
+            print("Still downloading decks...")
+        }
+    }
+    
+    @objc func increaseCurrentDeck(_ sender: UISwipeGestureRecognizer) {
+        pumpDeckButton()
+        if(GameScene.viewingDecks) {
+            if(DeckCollectionModel.deckIterator + 1 < DeckCollectionModel.allIds.count) {
+                DeckCollectionModel.deckIterator += 1
+            } else {
+                DeckCollectionModel.deckIterator = 0
+            }
+            loadCardImages()
+            print("Deck iterator changed to \(DeckCollectionModel.deckIterator)")
+            carousel.scrollToItem(at: 0, animated: true)
+        }
+    }
+    
+    @objc func decreaseCurrentDeck(_ sender: UISwipeGestureRecognizer) {
+        pumpDeckButton()
+        if(GameScene.viewingDecks) {
+            if(DeckCollectionModel.deckIterator - 1 >= 0) {
+                DeckCollectionModel.deckIterator -= 1
+            } else {
+                DeckCollectionModel.deckIterator = DeckCollectionModel.allIds.count-1
+            }
+            loadCardImages()
+            print("Deck iterator changed to \(DeckCollectionModel.deckIterator)")
+            carousel.scrollToItem(at: 0, animated: true)
+        }
+    }
+    
+    @objc func toggleCardCarousel(_ sender: UITapGestureRecognizer) {
+        GameScene.viewingDecks = false
+        GameScene.cardIsHidden = true
+        carousel.isHidden = false
+        card.isHidden = true
+        carousel.reloadData()
+    
         if(!carousel.isHidden && firstTap) {
-            firstTap = !firstTap
+            firstTap = false
             carousel.scrollToItem(at: GameViewController.cardTypes.count/2, animated: true)
         }
+    }
+    
+    func loadCardImages() {
+        print("Loading card images from deck \(DeckCollectionModel.deckIterator)...", terminator:"")
+        if(DeckCollectionModel.currentDeckNum != DeckCollectionModel.deckIterator) {
+            GameViewController.loaded = false
+            DeckCollectionModel.currentDeckNum = DeckCollectionModel.deckIterator
+        }
+        
+        if(CardCollectionModel.loaded && DeckCollectionModel.loaded && !GameViewController.loaded) {
+            GameViewController.dc.setCurrentDeck(DeckCollectionModel.allIds[DeckCollectionModel.deckIterator])
+            deckFronts.removeAll()
+            for d in GameViewController.dc.decks {
+                if(d.value.deckId == DeckCollectionModel.currentDeckId) {
+                    let c = GameViewController.cc.cards[d.value.cardId!]!
+                    c.quantity = d.value.quantity
+                    let tempImage = UIImage(named: c.imageURL!)
+                    let scale = (tempImage!.size.height / card.frame.height) *
+                        ((UIDevice.current.model == "iPhone") ? 0.5 : 1.0) // was 0.72
+                    let resized = tempImage!.scaleImage(toSize: CGSize(
+                        width: tempImage!.size.width*scale,
+                        height: tempImage!.size.height*scale))!
+                    let withQuantity = textToImage(drawText: "x\(c.quantity!)", inImage: resized, atPoint: CGPoint(x: resized.size.width/2-10, y: resized.size.height/2-20))
+                    deckFronts.append(withQuantity)
+                }
+            }
+            GameViewController.loaded = true
+            print("complete.")
+        } else {
+            print("cards loaded: \(CardCollectionModel.loaded), decks loaded: \(DeckCollectionModel.loaded)")
+        }
+        
+        carousel.reloadData()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        GameViewController.cc.initHomeModel()
+        GameViewController.dc.initHomeModel()
+        
         if(UIDevice.current.model == "iPhone") {
             GameViewController.screenScale = 0.35
+        } else {
+            GameViewController.screenScale = 0.5
         }
         
         for i in 1...GameScene.numCardFronts {
             let tempImage = UIImage(named: "images/cardFront\(i).png")
-            cardFronts.append(tempImage!.scaleImage(toSize: CGSize(width: tempImage!.size.width*GameViewController.screenScale, height: tempImage!.size.height*GameViewController.screenScale))!)
+            cardFronts.append(tempImage!.scaleImage(toSize: CGSize(
+                width: tempImage!.size.width*GameViewController.screenScale,
+                height: tempImage!.size.height*GameViewController.screenScale))!)
         }
         
         let image = UIImage(named: "images/cardBack.png")
@@ -104,15 +232,29 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
         card.contentMode = .center
         card.center = self.view.center
         self.view.addSubview(card)
+        
+        let image2 = UIImage(named: "images/decks.png")
+        var deckButtonScale = GameViewController.screenScale*0.5
+        if(UIDevice.current.model == "iPhone") {
+            deckButtonScale = GameViewController.screenScale*0.2
+        }
+        let resizedImage2 = image2?.scaleImage(toSize: CGSize(width: image2!.size.width*deckButtonScale, height: image2!.size.height*deckButtonScale))
+        viewDeckButton = UIImageView(image: resizedImage2!)
+        viewDeckButton.isUserInteractionEnabled = true
+        viewDeckButton.contentMode = .center
+        if(UIDevice.current.model == "iPhone") {
+            viewDeckButton.center = CGPoint(x: self.view.frame.width - 25, y: 17)
+        } else {
+            viewDeckButton.center = CGPoint(x: self.view.frame.width - 80, y: 40)
+        }
+        self.view.addSubview(viewDeckButton)
+        
         GameViewController.cardFrameHeight = card.image!.size.height
         GameViewController.cardFrameWidth = card.image!.size.width
         GameViewController.cardFrameX = card.frame.origin.x
         GameViewController.cardFrameY = card.frame.origin.y
         
         let imageF = UIImage(named: "images/cardFront1.png")
-        //let imageScaled = imageF!.scaleImage(toSize:
-        //    CGSize(width: imageF!.size.width * GameViewController.screenScale,
-        //           height: imageF!.size.height * GameViewController.screenScale))
         let tempCardF = UIImageView(image: imageF!)
         tempCardF.contentMode = .center
         tempCardF.center = self.view.center
@@ -121,8 +263,19 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
         GameViewController.cardFrontX = tempCardF.frame.origin.x
         GameViewController.cardFrontY = tempCardF.frame.origin.y
         
-        self.carousel.contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.toggleCarousel(_:))))
-        self.card.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.toggleCarousel(_:))))
+        self.viewDeckButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.toggleDeckCarousel(_:))))
+        self.carousel.contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.turnOffCarousel(_:))))
+        self.card.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.toggleCardCarousel(_:))))
+        
+        let gesture = UISwipeGestureRecognizer(target: self, action: #selector(self.increaseCurrentDeck(_:)))
+        gesture.direction = .up
+        gesture.numberOfTouchesRequired = 2 // 2 finger swipe
+        self.carousel.addGestureRecognizer(gesture)
+        
+        let gesture2 = UISwipeGestureRecognizer(target: self, action: #selector(self.decreaseCurrentDeck(_:)))
+        gesture2.direction = .down
+        gesture2.numberOfTouchesRequired = 2 // 2 finger swipe
+        self.carousel.addGestureRecognizer(gesture2)
         
         let sortedKeys = Array(GameViewController.cardTypes.keys).sorted(by: <)
         for name in sortedKeys {
@@ -134,6 +287,20 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
         carousel.center = self.view.center
         carousel.isHidden = true
         carousel.reloadData()
+        
+        //play "pump" animation
+        let imagesListArray: NSMutableArray = []
+        let deckImage1  = UIImage(named: "images/decks.png")
+        let resizedDeckImage1 = deckImage1?.scaleImage(toSize: CGSize(width: deckImage1!.size.width*deckButtonScale, height: deckImage1!.size.height*deckButtonScale))
+        imagesListArray.add(resizedDeckImage1!)
+        
+        let deckImage2  = UIImage(named: "images/decks2.png")
+        let resizedDeckImage2 = deckImage2?.scaleImage(toSize: CGSize(width: deckImage2!.size.width*deckButtonScale, height: deckImage2!.size.height*deckButtonScale))
+        imagesListArray.add(resizedDeckImage2!)
+        
+        self.viewDeckButton.animationImages = imagesListArray as? [UIImage]
+        self.viewDeckButton.animationDuration = 0.3
+        self.viewDeckButton.animationRepeatCount = 1
         
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
@@ -147,8 +314,8 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
             
             view.ignoresSiblingOrder = true
             
-            view.showsFPS = true
-            view.showsNodeCount = true
+            view.showsFPS = false
+            view.showsNodeCount = false
         }
     }
 
@@ -174,59 +341,85 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
     }
     
     func numberOfItems(in carousel: iCarousel) -> Int {
-        return GameViewController.cardTypes.keys.count
+        if(GameScene.viewingDecks) {
+            return deckFronts.count
+        } else {
+            return GameViewController.cardTypes.keys.count
+        }
     }
     
     func carousel(_ carousel: iCarousel, viewForItemAt index: Int, reusing view: UIView?) -> UIView {
-        var cardType: UILabel
-        var cardDescription: UILabel
         var itemView: UIImageView
-        
-        let randomIndex = Int(arc4random_uniform(UInt32(GameScene.numCardFronts)))
-        
-        //reuse view if available, otherwise create a new view
-        if let view = view as? UIImageView {
-            itemView = view
-            //get a reference to the label in the recycled view
-            cardType = itemView.viewWithTag(1) as! UILabel
-            cardDescription = itemView.viewWithTag(2) as! UILabel
+        if(GameScene.viewingDecks) {
+            //reuse view if available, otherwise create a new view
+            if let view = view as? UIImageView {
+                itemView = view
+            } else {
+                //don't do anything specific to the index within
+                //this `if ... else` statement because the view will be
+                //recycled and used with other index values later
+                itemView = UIImageView(frame: CGRect(x: 100, y: 0, width: 315, height: 450))
+                itemView.contentMode = .center
+            }
+            
+            itemView.image = deckFronts[index]
+            
+            return itemView
         } else {
-            //don't do anything specific to the index within
-            //this `if ... else` statement because the view will be
-            //recycled and used with other index values later
-            itemView = UIImageView(frame: CGRect(x: 100, y: 0, width: 315, height: 450))
-            itemView.image = cardFronts[randomIndex]
-            itemView.contentMode = .center
+            var cardType: UILabel
+            var cardDescription: UILabel
+            let randomIndex = Int(arc4random_uniform(UInt32(GameScene.numCardFronts)))
             
-            //cardType
-            cardType = UILabel(frame: CGRect(x: 315/11,
-                                             y: 154,
-                                             width: 315 - 315/6,
-                                             height: 450/2))
-            cardType.backgroundColor = .clear
-            cardType.textAlignment = .left
-            cardType.font = UIFont(name: "Magic:the Gathering", size: 21)
-            cardType.tag = 1
-            itemView.addSubview(cardType)
+            //reuse view if available, otherwise create a new view
+            if let view = view as? UIImageView {
+                itemView = view
+                //get a reference to the label in the recycled view
+                cardType = itemView.viewWithTag(1) as! UILabel
+                cardDescription = itemView.viewWithTag(2) as! UILabel
+            } else {
+                //don't do anything specific to the index within
+                //this `if ... else` statement because the view will be
+                //recycled and used with other index values later
+                itemView = UIImageView(frame: CGRect(x: 100, y: 0, width: 315, height: 450))
+                itemView.image = cardFronts[randomIndex]
+                itemView.contentMode = .center
+                
+                //cardType
+                let scale = CGFloat((UIDevice.current.model == "iPhone") ? 0.7 : 1.0)
+                let fontSize = CGFloat((UIDevice.current.model == "iPhone") ? 14 : 21)
+                let xOffset = CGFloat((UIDevice.current.model == "iPhone") ? 40 : 0)
+                let yOffset = CGFloat((UIDevice.current.model == "iPhone") ? -4 : 0)
+                let yOffsetType = CGFloat((UIDevice.current.model == "iPhone") ? 21 : 0)
+                
+                cardType = UILabel(frame: CGRect(x: 315/11+xOffset,
+                                                 y: 154+yOffsetType,
+                                                 width: (315 - 315/6)*scale,
+                                                 height: 450/2*scale))
+                cardType.backgroundColor = .clear
+                cardType.textAlignment = .left
+                cardType.font = UIFont(name: "Magic:the Gathering", size: fontSize)
+                cardType.tag = 1
+                itemView.addSubview(cardType)
+                
+                //cardDescription
+                cardDescription = UILabel(frame: CGRect(x: 315/12+xOffset,
+                                                        y: 235+yOffset,
+                                                        width: (315 - 315/6 - 5)*scale,
+                                                        height: 450/2*scale))
+                cardDescription.backgroundColor = .clear
+                cardDescription.textAlignment = .left
+                cardDescription.font = UIFont(name: "Magic:the Gathering", size: fontSize-1)
+                cardDescription.tag = 2
+                cardDescription.numberOfLines = 6
+                cardDescription.preferredMaxLayoutWidth = CGFloat((GameViewController.cardFrontWidth - 70)*scale)
+                itemView.addSubview(cardDescription)
+            }
             
-            //cardDescription
-            cardDescription = UILabel(frame: CGRect(x: 315/12,
-                                                    y: 235,
-                                                    width: 315 - 315/6 - 5,
-                                                    height: 450/2))
-            cardDescription.backgroundColor = .clear
-            cardDescription.textAlignment = .left
-            cardDescription.font = UIFont(name: "Magic:the Gathering", size: 20)
-            cardDescription.tag = 2
-            cardDescription.numberOfLines = 6
-            cardDescription.preferredMaxLayoutWidth = CGFloat(GameViewController.cardFrontWidth - 70)
-            itemView.addSubview(cardDescription)
+            cardType.text = GameViewController.cardTypeStrings[index]
+            cardDescription.text = GameViewController.cardTypeDescriptions[index]
+            
+            return itemView
         }
-        
-        cardType.text = GameViewController.cardTypeStrings[index]
-        cardDescription.text = GameViewController.cardTypeDescriptions[index]
-        
-        return itemView
     }
     
     func carousel(_ carousel: iCarousel, valueFor option: iCarouselOption, withDefault value: CGFloat) -> CGFloat {
@@ -234,5 +427,27 @@ class GameViewController: UIViewController, iCarouselDataSource, iCarouselDelega
             return value * 1.1
         }
         return value
+    }
+    
+    func textToImage(drawText text: String, inImage image: UIImage, atPoint point: CGPoint) -> UIImage {
+        let textColor = UIColor.white
+        let textFont = UIFont(name: "Magic:the Gathering", size: 32)!
+        
+        let scale = UIScreen.main.scale
+        UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
+        
+        let textFontAttributes = [
+            NSAttributedStringKey.font: textFont,
+            NSAttributedStringKey.foregroundColor: textColor,
+            ] as [NSAttributedStringKey : Any]
+        image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
+        
+        let rect = CGRect(origin: point, size: image.size)
+        text.draw(in: rect, withAttributes: textFontAttributes)
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage!
     }
 }
